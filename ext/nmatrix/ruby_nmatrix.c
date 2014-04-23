@@ -221,8 +221,8 @@ void Init_nmatrix() {
 	rb_define_alloc_func(cNMatrix, nm_alloc);
 
 	///////////////////////
-  // Singleton Methods //
-  ///////////////////////
+        // Singleton Methods //
+        ///////////////////////
 
 	rb_define_singleton_method(cNMatrix, "upcast", (METHOD)nm_upcast, 2); /* in ext/nmatrix/nmatrix.cpp */
 	rb_define_singleton_method(cNMatrix, "guess_dtype", (METHOD)nm_guess_dtype, 1);
