@@ -384,9 +384,7 @@ module NVector
       stype = args[0].is_a?(Symbol) ? args.shift : :dense
       shape = args[0].is_a?(Array) ? args.shift  : [1,args.shift]
 
-      if shape.size != 2 || !shape.include?(1) || shape == [1,1]
-        raise(ArgumentError, "shape must be a Fixnum or an Array of positive Fixnums where exactly one value is 1")
-      end
+      check_shape shape
 
       warn "NVector is deprecated and not guaranteed to work any longer"
 
@@ -643,6 +641,22 @@ module NVector
       result = NVector.linspace(a, b, n)
       result.each_stored_with_index { |element, i| result[i] = 10 ** element }
       result
+    end
+
+    # 
+    # call-seq:
+    #     check_shape(shape)
+    #
+    # Checks to see whether the shape of the NVector is compatible.
+    # Raises an error if it is not compatible.
+    #
+    # * *Arguments* :
+    #   - +shape+ -> The shape of the potential NVector in question
+    #
+    def check_shape shape
+      if shape.size != 2 || !shape.include?(1) || shape == [1,1]
+        raise(ArgumentError, "shape must be a Fixnum or an Array of positive Fixnums where exactly one value is 1")
+      end
     end
   end
 end

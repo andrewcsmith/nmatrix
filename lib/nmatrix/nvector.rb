@@ -57,9 +57,7 @@ class NVector < NMatrix
     stype = args[0].is_a?(Symbol) ? args.shift : :dense
     shape = args[0].is_a?(Array) ? args.shift  : [1,args.shift]
 
-    if shape.size != 2 || !shape.include?(1) || shape == [1,1]
-      raise(ArgumentError, "shape must be a Fixnum or an Array of positive Fixnums where exactly one value is 1")
-    end
+    check_shape shape
 
     warn "NVector is deprecated"
 
