@@ -29,12 +29,14 @@
 #ifndef GEEV_H
 # define GEEV_H
 
+#ifndef HAVE_FRAMEWORK_ACCELERATE
 extern "C" {
   void sgeev_(char* jobvl, char* jobvr, int* n, float* a,          int* lda, float* wr,  float* wi,  float* vl,          int* ldvl, float* vr,          int* ldvr, float* work,          int* lwork,                int* info);
   void dgeev_(char* jobvl, char* jobvr, int* n, double* a,         int* lda, double* wr, double* wi, double* vl,         int* ldvl, double* vr,         int* ldvr, double* work,         int* lwork,                int* info);
   void cgeev_(char* jobvl, char* jobvr, int* n, nm::Complex64* a,  int* lda, nm::Complex64* w,       nm::Complex64* vl,  int* ldvl, nm::Complex64* vr,  int* ldvr, nm::Complex64* work,  int* lwork, float* rwork,  int* info);
   void zgeev_(char* jobvl, char* jobvr, int* n, nm::Complex128* a, int* lda, nm::Complex128* w,      nm::Complex128* vl, int* ldvl, nm::Complex128* vr, int* ldvr, nm::Complex128* work, int* lwork, double* rwork, int* info);
 }
+#endif
 
 namespace nm { namespace math {
 
@@ -61,14 +63,32 @@ inline int geev(char jobvl, char jobvr, int n, double* a, int lda, double* w, do
 template <>
 inline int geev(char jobvl, char jobvr, int n, Complex64* a, int lda, Complex64* w, Complex64* wi, Complex64* vl, int ldvl, Complex64* vr, int ldvr, Complex64* work, int lwork, float* rwork) {
   int info;
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  __CLPK_complex* accelerate_A = (__CLPK_complex*) a;
+  __CLPK_complex* accelerate_w = (__CLPK_complex*) w;
+  __CLPK_complex* accelerate_vl = (__CLPK_complex*) vl;
+  __CLPK_complex* accelerate_vr = (__CLPK_complex*) vr;
+  __CLPK_complex* accelerate_work = (__CLPK_complex*) work;
+  cgeev_(&jobvl, &jobvr, &n, accelerate_A, &lda, accelerate_w, accelerate_vl, &ldvl, accelerate_vr, &ldvr, accelerate_work, &lwork, rwork, &info);
+#else
   cgeev_(&jobvl, &jobvr, &n, a, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork, rwork, &info);
+#endif
   return info;
 }
 
 template <>
 inline int geev(char jobvl, char jobvr, int n, Complex128* a, int lda, Complex128* w, Complex128* wi, Complex128* vl, int ldvl, Complex128* vr, int ldvr, Complex128* work, int lwork, double* rwork) {
   int info;
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  __CLPK_doublecomplex* accelerate_A = (__CLPK_doublecomplex*) a;
+  __CLPK_doublecomplex* accelerate_w = (__CLPK_doublecomplex*) w;
+  __CLPK_doublecomplex* accelerate_vl = (__CLPK_doublecomplex*) vl;
+  __CLPK_doublecomplex* accelerate_vr = (__CLPK_doublecomplex*) vr;
+  __CLPK_doublecomplex* accelerate_work = (__CLPK_doublecomplex*) work;
+  zgeev_(&jobvl, &jobvr, &n, accelerate_A, &lda, accelerate_w, accelerate_vl, &ldvl, accelerate_vr, &ldvr, accelerate_work, &lwork, rwork, &info);
+#else
   zgeev_(&jobvl, &jobvr, &n, a, &lda, w, vl, &ldvl, vr, &ldvr, work, &lwork, rwork, &info);
+#endif
   return info;
 }
 

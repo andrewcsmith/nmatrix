@@ -208,6 +208,9 @@ else
   have_header("clapack.h")
 end
 
+# Passes HAVE_FRAMEWORK_ACCELERATE flag
+have_framework('Accelerate')
+
 
 # Although have_func is supposed to take a list as its second argument, I find that it simply
 # applies a :to_s to the second arg and doesn't actually check each one. We may want to put

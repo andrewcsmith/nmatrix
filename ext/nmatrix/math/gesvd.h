@@ -29,12 +29,14 @@
 #ifndef GESVD_H
 # define GESVD_H
 
+#ifndef HAVE_FRAMEWORK_ACCELERATE
 extern "C" {
   void sgesvd_(char*, char*, int*, int*, float*, int*, float*, float*, int*, float*, int*, float*, int*, int*);
   void dgesvd_(char*, char*, int*, int*, double*, int*, double*, double*, int*, double*, int*, double*, int*, int*);
   void cgesvd_(char*, char*, int*, int*, nm::Complex64*, int*, nm::Complex64*, nm::Complex64*, int*, nm::Complex64*, int*, nm::Complex64*, int*, float*, int*);
   void zgesvd_(char*, char*, int*, int*, nm::Complex128*, int*, nm::Complex128*, nm::Complex128*, int*, nm::Complex128*, int*, nm::Complex128*, int*, double*, int*);
 }
+#endif
 
 namespace nm {
   namespace math {
@@ -62,14 +64,32 @@ namespace nm {
     template <>
     inline int gesvd(char jobu, char jobvt, int m, int n, nm::Complex64* a, int lda, nm::Complex64* s, nm::Complex64* u, int ldu, nm::Complex64* vt, int ldvt, nm::Complex64* work, int lwork, float* rwork) {
       int info;
+#if defined HAVE_FRAMEWORK_ACCELERATE
+      __CLPK_complex* accelerate_A = (__CLPK_complex*) a;
+      __CLPK_real* accelerate_s = (__CLPK_real*) s;
+      __CLPK_complex* accelerate_u = (__CLPK_complex*) u;
+      __CLPK_complex* accelerate_vt = (__CLPK_complex*) vt;
+      __CLPK_complex* accelerate_work = (__CLPK_complex*) work;
+      cgesvd_(&jobu, &jobvt, &m, &n, accelerate_A, &lda, accelerate_s, accelerate_u, &ldu, accelerate_vt, &ldvt, accelerate_work, &lwork, rwork, &info);
+#else
       cgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, rwork, &info);
+#endif
       return info;
     }
 
     template <>
     inline int gesvd(char jobu, char jobvt, int m, int n, nm::Complex128* a, int lda, nm::Complex128* s, nm::Complex128* u, int ldu, nm::Complex128* vt, int ldvt, nm::Complex128* work, int lwork, double* rwork) {
       int info;
+#if defined HAVE_FRAMEWORK_ACCELERATE
+      __CLPK_doublecomplex* accelerate_A = (__CLPK_doublecomplex*) a;
+      __CLPK_doublereal* accelerate_s = (__CLPK_doublereal*) s;
+      __CLPK_doublecomplex* accelerate_u = (__CLPK_doublecomplex*) u;
+      __CLPK_doublecomplex* accelerate_vt = (__CLPK_doublecomplex*) vt;
+      __CLPK_doublecomplex* accelerate_work = (__CLPK_doublecomplex*) work;
+      zgesvd_(&jobu, &jobvt, &m, &n, accelerate_A, &lda, accelerate_s, accelerate_u, &ldu, accelerate_vt, &ldvt, accelerate_work, &lwork, rwork, &info);
+#else
       zgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, rwork, &info);
+#endif
       return info;
     }
 

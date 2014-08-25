@@ -1268,7 +1268,7 @@ static VALUE nm_clapack_lauum(VALUE self, VALUE order, VALUE uplo, VALUE n, VALU
       NULL, NULL, NULL, NULL, NULL,
       nm::math::clapack_lauum<false, float>,
       nm::math::clapack_lauum<false, double>,
-#if defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)
+#if (defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)) && !(defined (HAVE_FRAMEWORK_ACCELERATE))
       clapack_clauum, clapack_zlauum, // call directly, same function signature!
 #else // Especially important for Mac OS, which doesn't seem to include the ATLAS clapack interface.
       nm::math::clapack_lauum<true, nm::Complex64>,
@@ -1323,7 +1323,7 @@ static VALUE nm_clapack_getrf(VALUE self, VALUE order, VALUE m, VALUE n, VALUE a
       NULL, NULL, NULL, NULL, NULL, // integers not allowed due to division
       nm::math::clapack_getrf<float>,
       nm::math::clapack_getrf<double>,
-#if defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)
+#if (defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)) && !(defined (HAVE_FRAMEWORK_ACCELERATE))
       clapack_cgetrf, clapack_zgetrf, // call directly, same function signature!
 #else // Especially important for Mac OS, which doesn't seem to include the ATLAS clapack interface.
       nm::math::clapack_getrf<nm::Complex64>,
@@ -1378,7 +1378,7 @@ static VALUE nm_clapack_potrf(VALUE self, VALUE order, VALUE uplo, VALUE n, VALU
       NULL, NULL, NULL, NULL, NULL, // integers not allowed due to division
       nm::math::clapack_potrf<float>,
       nm::math::clapack_potrf<double>,
-#if defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)
+#if (defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)) && !(defined (HAVE_FRAMEWORK_ACCELERATE))
       clapack_cpotrf, clapack_zpotrf, // call directly, same function signature!
 #else // Especially important for Mac OS, which doesn't seem to include the ATLAS clapack interface.
       nm::math::clapack_potrf<nm::Complex64>,
@@ -1414,7 +1414,7 @@ static VALUE nm_clapack_getrs(VALUE self, VALUE order, VALUE trans, VALUE n, VAL
       NULL, NULL, NULL, NULL, NULL, // integers not allowed due to division
       nm::math::clapack_getrs<float>,
       nm::math::clapack_getrs<double>,
-#if defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)
+#if (defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)) && !(defined (HAVE_FRAMEWORK_ACCELERATE))
       clapack_cgetrs, clapack_zgetrs, // call directly, same function signature!
 #else // Especially important for Mac OS, which doesn't seem to include the ATLAS clapack interface.
       nm::math::clapack_getrs<nm::Complex64>,
@@ -1460,7 +1460,7 @@ static VALUE nm_clapack_potrs(VALUE self, VALUE order, VALUE uplo, VALUE n, VALU
       NULL, NULL, NULL, NULL, NULL, // integers not allowed due to division
       nm::math::clapack_potrs<float,false>,
       nm::math::clapack_potrs<double,false>,
-#if defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)
+#if (defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)) && !(defined (HAVE_FRAMEWORK_ACCELERATE))
       clapack_cpotrs, clapack_zpotrs, // call directly, same function signature!
 #else // Especially important for Mac OS, which doesn't seem to include the ATLAS clapack interface.
       nm::math::clapack_potrs<nm::Complex64,true>,
@@ -1519,7 +1519,7 @@ static VALUE nm_clapack_getri(VALUE self, VALUE order, VALUE n, VALUE a, VALUE l
       NULL, NULL, NULL, NULL, NULL, // integers not allowed due to division
       nm::math::clapack_getri<float>,
       nm::math::clapack_getri<double>,
-#if defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)
+#if (defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)) && !(defined (HAVE_FRAMEWORK_ACCELERATE))
       clapack_cgetri, clapack_zgetri, // call directly, same function signature!
 #else // Especially important for Mac OS, which doesn't seem to include the ATLAS clapack interface.
       nm::math::clapack_getri<nm::Complex64>,
@@ -1575,7 +1575,7 @@ static VALUE nm_clapack_potri(VALUE self, VALUE order, VALUE uplo, VALUE n, VALU
       NULL, NULL, NULL, NULL, NULL, // integers not allowed due to division
       nm::math::clapack_potri<float>,
       nm::math::clapack_potri<double>,
-#if defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)
+#if (defined (HAVE_CLAPACK_H) || defined (HAVE_ATLAS_CLAPACK_H)) && !(defined (HAVE_FRAMEWORK_ACCELERATE))
       clapack_cpotri, clapack_zpotri, // call directly, same function signature!
 #else // Especially important for Mac OS, which doesn't seem to include the ATLAS clapack interface.
       nm::math::clapack_potri<nm::Complex64>,

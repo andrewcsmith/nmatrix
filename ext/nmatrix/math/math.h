@@ -549,22 +549,86 @@ inline int potrf(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const
 #if defined HAVE_CLAPACK_H || defined HAVE_ATLAS_CLAPACK_H
 template <>
 inline int potrf(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, float* A, const int lda) {
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+
+  // Converting from row-major to column-major
+  float column_major[N*N];
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      column_major[i + N*j] = A[N*i + j];
+    }
+  }
+
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+
+  int return_value = spotrf_(&new_uplo, &accelerate_N, column_major, &accelerate_lda, &info);
+  
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      A[N*i + j] = column_major[i + N*j];
+    }
+  }
+
+  return return_value;
+#else
   return clapack_spotrf(order, uplo, N, A, lda);
+#endif
 }
 
 template <>
 inline int potrf(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, double* A, const int lda) {
-  return clapack_dpotrf(order, uplo, N, A, lda);
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+  __CLPK_doublereal* accelerate_A;
+  accelerate_A = (__CLPK_doublereal*) A;
+  return dpotrf_(&new_uplo, &accelerate_N, accelerate_A, &accelerate_lda, &info);
+#else
+ return clapack_dpotrf(order, uplo, N, A, lda);
+#endif
 }
 
 template <>
 inline int potrf(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, Complex64* A, const int lda) {
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+  __CLPK_complex* accelerate_A;
+  accelerate_A = (__CLPK_complex*) A;
+  return cpotrf_(&new_uplo, &accelerate_N, accelerate_A, &accelerate_lda, &info);
+#else
   return clapack_cpotrf(order, uplo, N, reinterpret_cast<void*>(A), lda);
+#endif
 }
 
 template <>
 inline int potrf(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, Complex128* A, const int lda) {
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+  __CLPK_doublecomplex* accelerate_A;
+  accelerate_A = (__CLPK_doublecomplex*) A;
+  return zpotrf_(&new_uplo, &accelerate_N, accelerate_A, &accelerate_lda, &info);
+#else
   return clapack_zpotrf(order, uplo, N, reinterpret_cast<void*>(A), lda);
+#endif
 }
 #endif
 
@@ -938,22 +1002,70 @@ inline void lauum(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, cons
 #if defined HAVE_CLAPACK_H || defined HAVE_ATLAS_CLAPACK_H
 template <bool is_complex>
 inline void lauum(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, float* A, const int lda) {
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+  __CLPK_real* accelerate_A;
+  accelerate_A = (__CLPK_real*) A;
+  slauum_(&new_uplo, &accelerate_N, accelerate_A, &accelerate_lda, &info);
+#else
   clapack_slauum(order, uplo, N, A, lda);
+#endif
 }
 
 template <bool is_complex>
 inline void lauum(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, double* A, const int lda) {
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+  __CLPK_doublereal* accelerate_A;
+  accelerate_A = (__CLPK_doublereal*) A;
+  return dlauum_(&new_uplo, &accelerate_N, accelerate_A, &accelerate_lda, &info);
+#else
   clapack_dlauum(order, uplo, N, A, lda);
+#endif
 }
 
 template <bool is_complex>
 inline void lauum(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, Complex64* A, const int lda) {
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+  __CLPK_complex* accelerate_A;
+  accelerate_A = (__CLPK_complex*) A;
+  return clauum_(&new_uplo, &accelerate_N, accelerate_A, &accelerate_lda, &info);
+#else
   clapack_clauum(order, uplo, N, A, lda);
+#endif
 }
 
 template <bool is_complex>
 inline void lauum(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, Complex128* A, const int lda) {
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+  __CLPK_doublecomplex* accelerate_A;
+  accelerate_A = (__CLPK_doublecomplex*) A;
+  return zlauum_(&new_uplo, &accelerate_N, accelerate_A, &accelerate_lda, &info);
+#else
   clapack_zlauum(order, uplo, N, A, lda);
+#endif
 }
 #endif
 
@@ -1028,23 +1140,71 @@ inline int potri(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const
 
 #if defined HAVE_CLAPACK_H || defined HAVE_ATLAS_CLAPACK_H
 template <>
-inline int potri(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int n, float* a, const int lda) {
+inline int potri(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, float* A, const int lda) {
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+  __CLPK_real* accelerate_A;
+  accelerate_A = (__CLPK_real*) A;
+  return spotri_(&new_uplo, &accelerate_N, accelerate_A, &accelerate_lda, &info);
+#else
   return clapack_spotri(order, uplo, n, a, lda);
+#endif
 }
 
 template <>
-inline int potri(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int n, double* a, const int lda) {
+inline int potri(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, double* A, const int lda) {
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+  __CLPK_doublereal* accelerate_A;
+  accelerate_A = (__CLPK_doublereal*) A;
+  return dpotri_(&new_uplo, &accelerate_N, accelerate_A, &accelerate_lda, &info);
+#else
   return clapack_dpotri(order, uplo, n, a, lda);
+#endif
 }
 
 template <>
-inline int potri(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int n, Complex64* a, const int lda) {
+inline int potri(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, Complex64* A, const int lda) {
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+  __CLPK_complex* accelerate_A;
+  accelerate_A = (__CLPK_complex*) A;
+  return cpotri_(&new_uplo, &accelerate_N, accelerate_A, &accelerate_lda, &info);
+#else
   return clapack_cpotri(order, uplo, n, reinterpret_cast<void*>(a), lda);
+#endif
 }
 
 template <>
-inline int potri(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int n, Complex128* a, const int lda) {
+inline int potri(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, Complex128* A, const int lda) {
+#if defined HAVE_FRAMEWORK_ACCELERATE
+  char new_uplo; 
+  if (uplo == CblasUpper) { new_uplo = 'U'; }
+  if (uplo == CblasLower) { new_uplo = 'L'; }
+  __CLPK_integer info;
+  __CLPK_integer accelerate_N = (long int) N;
+  __CLPK_integer accelerate_lda = (long int) lda;
+  __CLPK_doublecomplex* accelerate_A;
+  accelerate_A = (__CLPK_doublecomplex*) A;
+  return zpotri_(&new_uplo, &accelerate_N, accelerate_A, &accelerate_lda, &info);
+#else
   return clapack_zpotri(order, uplo, n, reinterpret_cast<void*>(a), lda);
+#endif
 }
 #endif
 
