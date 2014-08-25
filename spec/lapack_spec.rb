@@ -336,10 +336,15 @@ describe NMatrix::LAPACK do
         rescue NotImplementedError => e
           pending e.to_s
         end
+        sigma = NMatrix.zeros(a.shape);
+        # Set the diagonals of sigma
+        s.to_a.flatten.each_with_index {|x, i| sigma[i, i] = x}
         expect(u).to be_within(err).of(left_true)
         #FIXME: Is the next line correct?
         expect(vt[0...right_true.shape[0], 0...right_true.shape[1]-1]).to be_within(err).of(right_true[0...right_true.shape[0],0...right_true.shape[1]-1])
         expect(s.transpose).to be_within(err).of(s_true.row(0))
+        # If the example is correct, A == US(V*)
+        expect(u.dot(sigma).dot(vt)).to be_within(err).of(a)
 
       end
       it "exposes the convenience gesdd method" do
