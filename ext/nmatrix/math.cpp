@@ -117,6 +117,7 @@
 #include <limits>
 
 #include "math/inc.h"
+#include "math/ordering.h"
 #include "data/data.h"
 #include "math/gesdd.h"
 #include "math/gesvd.h"
@@ -150,7 +151,7 @@
  */
 
 extern "C" {
-#if defined HAVE_CLAPACK_H
+#if defined HAVE_CLAPACK_H || HAVE_FRAMEWORK_ACCELERATE
   #include <clapack.h>
 #elif defined HAVE_ATLAS_CLAPACK_H
   #include <atlas/clapack.h>
@@ -1292,7 +1293,6 @@ static VALUE nm_clapack_lauum(VALUE self, VALUE order, VALUE uplo, VALUE n, VALU
 
   return a;
 }
-
 
 /* Call any of the clapack_xgetrf functions as directly as possible.
  *
