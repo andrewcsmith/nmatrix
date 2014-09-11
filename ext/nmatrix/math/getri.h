@@ -59,7 +59,6 @@
 #ifndef GETRI_H
 #define GETRI_H
 
-
 namespace nm { namespace math {
 
 template <typename DType>
@@ -76,14 +75,23 @@ inline int getri(const enum CBLAS_ORDER order, const int n, float* a, const int 
   __CLPK_integer accelerate_N = (long int) n;
   __CLPK_integer accelerate_lda = (long int) lda;
   __CLPK_integer* accelerate_ipiv = (__CLPK_integer*) ipiv;
-  __CLPK_real accelerate_work;
-  __CLPK_integer accelerate_lwork = -1;
+  __CLPK_integer lwork = n;
+  __CLPK_real work[n];
 
   // Assign the pointer to the finished array
-  // TODO: We may have to then copy this info back over to the original input a
-  __CLPK_real* accelerate_A;
-  accelerate_A = (__CLPK_real*) a;
-  return sgetri_(&accelerate_N, accelerate_A, &accelerate_lda, accelerate_ipiv, &accelerate_work, &accelerate_lwork, &info);
+  __CLPK_real* accelerate_A = (__CLPK_real*) a;
+
+  // If it is row-major, we need to transpose before and after
+  if(order == CblasRowMajor) {
+    convert_order(n, lda, accelerate_A);
+    int return_value = sgetri_(&accelerate_N, accelerate_A, &accelerate_lda, 
+        accelerate_ipiv, work, &lwork, &info);
+    convert_order(n, lda, accelerate_A);
+    return return_value;
+  } else {
+    return sgetri_(&accelerate_N, accelerate_A, &accelerate_lda,
+        accelerate_ipiv, work, &lwork, &info);
+  }
 #else
   return clapack_sgetri(order, n, a, lda, ipiv);
 #endif
@@ -96,14 +104,23 @@ inline int getri(const enum CBLAS_ORDER order, const int n, double* a, const int
   __CLPK_integer accelerate_N = (long int) n;
   __CLPK_integer accelerate_lda = (long int) lda;
   __CLPK_integer* accelerate_ipiv = (__CLPK_integer*) ipiv;
-  __CLPK_doublereal accelerate_work;
-  __CLPK_integer accelerate_lwork = -1;
+  __CLPK_integer lwork = n;
+  __CLPK_doublereal work[n];
 
   // Assign the pointer to the finished array
-  // TODO: We may have to then copy this info back over to the original input a
-  __CLPK_doublereal* accelerate_A;
-  accelerate_A = (__CLPK_doublereal*) a;
-  return dgetri_(&accelerate_N, accelerate_A, &accelerate_lda, accelerate_ipiv, &accelerate_work, &accelerate_lwork, &info);
+  __CLPK_doublereal* accelerate_A = (__CLPK_doublereal*) a;
+
+  // If it is row-major, we need to transpose before and after
+  if(order == CblasRowMajor) {
+    convert_order(n, lda, accelerate_A);
+    int return_value = dgetri_(&accelerate_N, accelerate_A, &accelerate_lda,
+        accelerate_ipiv, work, &lwork, &info);
+    convert_order(n, lda, accelerate_A);
+    return return_value;
+  } else {
+    return dgetri_(&accelerate_N, accelerate_A, &accelerate_lda,
+        accelerate_ipiv, work, &lwork, &info);
+  }
 #else
   return clapack_dgetri(order, n, a, lda, ipiv);
 #endif
@@ -116,14 +133,23 @@ inline int getri(const enum CBLAS_ORDER order, const int n, Complex64* a, const 
   __CLPK_integer accelerate_N = (long int) n;
   __CLPK_integer accelerate_lda = (long int) lda;
   __CLPK_integer* accelerate_ipiv = (__CLPK_integer*) ipiv;
-  __CLPK_complex accelerate_work;
-  __CLPK_integer accelerate_lwork = -1;
+  __CLPK_integer lwork = n;
+  __CLPK_complex work[n];
 
   // Assign the pointer to the finished array
-  // TODO: We may have to then copy this info back over to the original input a
-  __CLPK_complex* accelerate_A;
-  accelerate_A = (__CLPK_complex*) a;
-  return cgetri_(&accelerate_N, accelerate_A, &accelerate_lda, accelerate_ipiv, &accelerate_work, &accelerate_lwork, &info);
+  __CLPK_complex* accelerate_A = (__CLPK_complex*) a;
+
+  // If it is row-major, we need to transpose before and after
+  if(order == CblasRowMajor) {
+    convert_order(n, lda, accelerate_A);
+    int return_value = cgetri_(&accelerate_N, accelerate_A, &accelerate_lda,
+        accelerate_ipiv, work, &lwork, &info);
+    convert_order(n, lda, accelerate_A);
+    return return_value;
+  } else {
+    return cgetri_(&accelerate_N, accelerate_A, &accelerate_lda,
+        accelerate_ipiv, work, &lwork, &info);
+  }
 #else
   return clapack_cgetri(order, n, reinterpret_cast<void*>(a), lda, ipiv);
 #endif
@@ -136,14 +162,23 @@ inline int getri(const enum CBLAS_ORDER order, const int n, Complex128* a, const
   __CLPK_integer accelerate_N = (long int) n;
   __CLPK_integer accelerate_lda = (long int) lda;
   __CLPK_integer* accelerate_ipiv = (__CLPK_integer*) ipiv;
-  __CLPK_doublecomplex accelerate_work;
-  __CLPK_integer accelerate_lwork = -1;
+  __CLPK_integer lwork = n;
+  __CLPK_doublecomplex work[n];
 
   // Assign the pointer to the finished array
-  // TODO: We may have to then copy this info back over to the original input a
-  __CLPK_doublecomplex* accelerate_A;
-  accelerate_A = (__CLPK_doublecomplex*) a;
-  return zgetri_(&accelerate_N, accelerate_A, &accelerate_lda, accelerate_ipiv, &accelerate_work, &accelerate_lwork, &info);
+  __CLPK_doublecomplex* accelerate_A = (__CLPK_doublecomplex*) a;
+  
+  // If it is row-major, we need to transpose before and after
+  if(order == CblasRowMajor) {
+    convert_order(n, lda, accelerate_A);
+    int return_value = zgetri_(&accelerate_N, accelerate_A, &accelerate_lda,
+        accelerate_ipiv, work, &lwork, &info);
+    convert_order(n, lda, accelerate_A);
+    return return_value;
+  } else {
+    return zgetri_(&accelerate_N, accelerate_A, &accelerate_lda,
+        accelerate_ipiv, work, &lwork, &info);
+  }
 #else
   return clapack_zgetri(order, n, reinterpret_cast<void*>(a), lda, ipiv);
 #endif
