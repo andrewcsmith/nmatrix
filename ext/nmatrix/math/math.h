@@ -69,13 +69,13 @@
  */
 
 extern "C" { // These need to be in an extern "C" block or you'll get all kinds of undefined symbol errors.
-#if defined HAVE_CBLAS_H
+#if defined HAVE_CBLAS_H || HAVE_FRAMEWORK_ACCELERATE
   #include <cblas.h>
 #elif defined HAVE_ATLAS_CBLAS_H
   #include <atlas/cblas.h>
 #endif
 
-#if defined HAVE_CLAPACK_H
+#if defined HAVE_CLAPACK_H || HAVE_FRAMEWORK_ACCELERATE
   #include <clapack.h>
 #elif defined HAVE_ATLAS_CLAPACK_H
   #include <atlas/clapack.h>
@@ -551,30 +551,15 @@ template <>
 inline int potrf(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, float* A, const int lda) {
 #if defined HAVE_FRAMEWORK_ACCELERATE
   char new_uplo; 
-  if (uplo == CblasUpper) { new_uplo = 'U'; }
-  if (uplo == CblasLower) { new_uplo = 'L'; }
-
-  // Converting from row-major to column-major
-  float column_major[N*N];
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      column_major[i + N*j] = A[N*i + j];
-    }
-  }
-
+  // Since the matrix is symmetrical, we can read our row-major upper triangular
+  // matrix as a lower triangular and it's as if we're reading it in
+  // column-major order.
+  if (uplo == CblasUpper) { new_uplo = 'L'; }
+  else if (uplo == CblasLower) { new_uplo = 'U'; }
   __CLPK_integer info;
   __CLPK_integer accelerate_N = (long int) N;
   __CLPK_integer accelerate_lda = (long int) lda;
-
-  int return_value = spotrf_(&new_uplo, &accelerate_N, column_major, &accelerate_lda, &info);
-  
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      A[N*i + j] = column_major[i + N*j];
-    }
-  }
-
-  return return_value;
+  return spotrf_(&new_uplo, &accelerate_N, A, &accelerate_lda, &info);
 #else
   return clapack_spotrf(order, uplo, N, A, lda);
 #endif
@@ -584,8 +569,8 @@ template <>
 inline int potrf(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, double* A, const int lda) {
 #if defined HAVE_FRAMEWORK_ACCELERATE
   char new_uplo; 
-  if (uplo == CblasUpper) { new_uplo = 'U'; }
-  if (uplo == CblasLower) { new_uplo = 'L'; }
+  if (uplo == CblasUpper) { new_uplo = 'L'; }
+  else if (uplo == CblasLower) { new_uplo = 'U'; }
   __CLPK_integer info;
   __CLPK_integer accelerate_N = (long int) N;
   __CLPK_integer accelerate_lda = (long int) lda;
@@ -601,8 +586,8 @@ template <>
 inline int potrf(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, Complex64* A, const int lda) {
 #if defined HAVE_FRAMEWORK_ACCELERATE
   char new_uplo; 
-  if (uplo == CblasUpper) { new_uplo = 'U'; }
-  if (uplo == CblasLower) { new_uplo = 'L'; }
+  if (uplo == CblasUpper) { new_uplo = 'L'; }
+  else if (uplo == CblasLower) { new_uplo = 'U'; }
   __CLPK_integer info;
   __CLPK_integer accelerate_N = (long int) N;
   __CLPK_integer accelerate_lda = (long int) lda;
@@ -618,8 +603,8 @@ template <>
 inline int potrf(const enum CBLAS_ORDER order, const enum CBLAS_UPLO uplo, const int N, Complex128* A, const int lda) {
 #if defined HAVE_FRAMEWORK_ACCELERATE
   char new_uplo; 
-  if (uplo == CblasUpper) { new_uplo = 'U'; }
-  if (uplo == CblasLower) { new_uplo = 'L'; }
+  if (uplo == CblasUpper) { new_uplo = 'L'; }
+  if (uplo == CblasLower) { new_uplo = 'U'; }
   __CLPK_integer info;
   __CLPK_integer accelerate_N = (long int) N;
   __CLPK_integer accelerate_lda = (long int) lda;
