@@ -31,13 +31,13 @@
 
 
 extern "C" { // These need to be in an extern "C" block or you'll get all kinds of undefined symbol errors.
-#if defined HAVE_CBLAS_H
+#if defined HAVE_CBLAS_H || HAVE_ACCELERATE_FRAMEWORK
   #include <cblas.h>
 #elif defined HAVE_ATLAS_CBLAS_H
   #include <atlas/cblas.h>
 #endif
 
-#if defined HAVE_CLAPACK_H
+#if defined HAVE_CLAPACK_H || HAVE_ACCELERATE_FRAMEWORK
   #include <clapack.h>
 #elif defined HAVE_ATLAS_CLAPACK_H
   #include <atlas/clapack.h>
