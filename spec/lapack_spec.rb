@@ -74,6 +74,8 @@ describe NMatrix::LAPACK do
         a = NMatrix.new(3, [4,9,2,3,5,7,8,1,6], dtype: dtype)
         NMatrix::LAPACK::clapack_getrf(:row, 3, 3, a, 3)
 
+        b = NMatrix.new(3, [9, 2.quo(9), 4.quo(9), 5, 53.quo(9), 7.quo(53), 1, 52.quo(9), 360.quo(53)], dtype: dtype)
+
         # delta varies for different dtypes
         err = case dtype
                 when :float32, :complex64
@@ -83,6 +85,10 @@ describe NMatrix::LAPACK do
                 else
                   1e-64 # FIXME: should be 0, but be_within(0) does not work.
               end
+
+        # a.zip(b).each do |res|
+        #   expect(res.first).to be_within(err).of(res.last)
+        # end
 
         expect(a[0,0]).to eq(9) # 8
         expect(a[0,1]).to be_within(err).of(2.quo(9)) # 1
@@ -127,14 +133,19 @@ describe NMatrix::LAPACK do
       end
 
       it "exposes clapack_getri" do
-        a = NMatrix.new(:dense, 3, [1,0,4,1,1,6,-3,0,-10], dtype)
-        ipiv = NMatrix::LAPACK::clapack_getrf(:row, 3, 3, a, 3) # get pivot from getrf, use for getri
+        # This is not the matrix, but the lower and upper factors of the original matrix.
+        a = NMatrix.new(:dense, 3, [-3, 0, -10, -0.333333, 1, 2.66667, -0.333333, 0, 0.666667], dtype)
+        # Note that this ipiv call is not identical to the value returned from
+        # getrf
+        ipiv = [3,2,3]
 
         begin
           NMatrix::LAPACK::clapack_getri(:row, 3, a, 3, ipiv)
-
           b = NMatrix.new(:dense, 3, [-5,0,-2,-4,1,-1,1.5,0,0.5], dtype)
-          expect(a).to eq(b)
+          # Need to check each element
+          b.zip(a).each do |res|
+            expect(res[0]).to be_within(0.001).of(res[1])
+          end
         rescue NotImplementedError => e
           pending e.to_s
         end
